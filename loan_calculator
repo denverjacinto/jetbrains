@@ -1,0 +1,125 @@
+import argparse
+import math
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--type", type=str, choices=["annuity", "diff"], help="display the type of calculation")
+parser.add_argument("--principal", type=int, help="display loan principal")
+parser.add_argument("--periods", type=int, help="display the period")
+parser.add_argument("--interest", type=float, help="display interest")
+parser.add_argument("--payment", type=int, help="display the payment")
+
+args = parser.parse_args()
+
+attr_list = []
+arg_list = []
+period_list = []
+args = parser.parse_args()
+for item in vars(args):
+    if getattr(args, item) is not None:
+        attr_list.append(getattr(args, item))
+        arg_list.append(item)
+
+# counter
+d_1 = 1
+period_count = 0
+p_1 = 0
+
+def compute_a(): # computation of annuity payment
+    global ordinary_annuity
+    global monthly_interest
+    monthly_interest = args.interest / (12 * 100)  # i
+    ordinary_annuity = args.principal * (monthly_interest) * (math.pow(1 + monthly_interest, args.periods)) / (math.pow(1 + monthly_interest, args.periods) - 1)
+    print(f"Your annuity payment = {math.ceil(ordinary_annuity)}!")  # monthly annuity
+
+def compute_b():
+    global monthly_downpay
+    global monthly_interest
+    monthly_interest = args.interest / (12 * 100)  # i
+    monthly_downpay = math.ceil((args.principal / args.periods) + monthly_interest * (args.principal - args.principal * ((d_1 - 1) / args.periods)))
+    period_list.append(monthly_downpay)
+
+def compute_p():
+    global loan_principal_P
+    global monthly_interest
+    monthly_interest = args.interest / (12 * 100)  # i
+    loan_principal_P = args.payment / ((monthly_interest * math.pow(1 + monthly_interest, args.periods)) / (math.pow(1 + monthly_interest, args.periods) - 1))
+    print(f"Your loan principal = {math.floor(loan_principal_P)}!")
+    over = (args.payment * args.periods) - loan_principal_P
+    print(f"Overpayment = {math.ceil(over)}")
+
+def compute_n():
+    global year_month
+    global monthly_interest
+    global n_convert
+    global n
+    month = args.principal / args.payment
+    year_month = divmod(month, 12)
+    monthly_interest = args.interest / (12 * 100)
+    n = math.ceil(math.log(args.payment / (args.payment - monthly_interest * args.principal), args.interest + 1))
+    n_convert = divmod(n, 12)
+    # n_convert_year = int(n_convert[0])
+    # n_convert_month = int(n_convert[1])
+    print(f"It will take {round(year_month[0] + n)} years to repay this loan!")
+    over = (args.payment * (round(year_month[0] + n) * 12)) - args.principal
+    print(f"Overpayment = {math.ceil(over)}")
+
+if len(arg_list) == 4:
+    if args.type == "diff":
+        if len(arg_list) == 4:
+            if ("principal" in arg_list) and ("periods" in arg_list) and ("interest" in arg_list):
+                if args.principal >= 1 and args.periods >= 1 and args.interest >= 1:
+                    monthly_interest = args.interest / (12 * 100)
+                    while period_count != args.periods:
+                        monthly_downpay = math.ceil((args.principal / args.periods) + monthly_interest * (
+                                    args.principal - args.principal * ((d_1 - 1) / args.periods)))
+                        period_list.append(monthly_downpay)
+                        d_1 += 1
+                        period_count += 1
+                    for i in period_list:
+                        print(f"Month {p_1 + 1}: payment is {period_list[p_1]}")
+                        p_1 += 1
+                    print("Overpayment = " + str(sum(period_list) - args.principal))
+                else:
+                    print("Incorrect parameters")
+            else:
+                print("Incorrect parameters")
+        else:
+            print("Incorrect parameters")
+    # Annuity
+    elif args.type == "annuity":
+        if len(arg_list) == 4:
+            if ("principal" in arg_list) and ("periods" in arg_list) and ("interest" in arg_list):
+                if args.principal >= 1 and args.periods >= 1 and args.interest >= 1:
+                    compute_a()
+                    while period_count != args.periods:
+                        monthly_downpay = ((args.principal / args.periods) + monthly_interest * (
+                                args.principal - args.principal * ((d_1 - 1) / args.periods)))
+                        period_list.append(monthly_downpay)
+                        d_1 += 1
+                        period_count += 1
+                    over = (math.ceil(ordinary_annuity) * args.periods) - args.principal
+                    print(f"Overpayment = {over}")
+                else:
+                    print("Incorrect parameters")
+            elif ("payment" in arg_list) and ("periods" in arg_list) and ("interest" in arg_list):
+                if args.payment >= 1 and args.periods >= 1 and args.interest >= 1:
+                    compute_p()
+                else:
+                    print("Incorrect parameters")
+            elif ("principal" in arg_list) and ("payment" in arg_list) and ("interest" in arg_list):
+                if args.principal >= 1 and args.payment >= 1 and args.interest >= 1:
+                    compute_n()
+                else:
+                    print("Incorrect parameters")
+            else:
+                print("Incorrect parameters")
+        else:
+            print("Incorrect parameters")
+
+    else:
+        print("Incorrect parameters")
+else:
+    print("Incorrect parameters")
+
+
+

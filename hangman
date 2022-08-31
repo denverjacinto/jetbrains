@@ -1,0 +1,84 @@
+import random
+print("H A N G M A N")
+
+win_score = 0
+lost_score = 0
+counter = None
+
+def main():
+    global win_score, lost_score, counter
+    word_list = ["python", "java", "swift", "javascript"]
+    random_word = random.choice(word_list)
+    random_word_hint = ("-" * (len(random_word) - 0))
+
+    counter = 0
+    def my_set_list_checker(set_list, guess_attempt):
+        count = 0
+        global counter
+        for x in set_list:
+            if (x == guess_attempt):
+                count = count + 1
+        if count >= 2:
+            print("You've already guessed this letter.")
+            counter = counter + 1
+
+
+    set_list = []
+    not_set_list = []
+    while counter != 8:
+        print("")
+        print(random_word_hint)
+        guess_attempt = input("Input a letter: ")
+        not_set_list.append(guess_attempt)  # list_of_guess_letter_not_in_word
+        not_set_list_count = 0
+        for xx in not_set_list:
+            if (xx == guess_attempt):
+                not_set_list_count = not_set_list_count + 1
+        my_list = []
+        position_list = []
+        for i in random_word:
+            my_list.append(i)
+        for i in range(0, len(my_list)):
+            if my_list[i] == guess_attempt:
+                position_list.append(i)
+        # print(my_list)
+        # print(position_list)
+
+        if guess_attempt in my_list:
+            for i in position_list:
+                random_word_hint = random_word_hint[:i] + guess_attempt + random_word_hint[i + 1:]
+            set_list.append(guess_attempt)
+            my_set_list_checker(set_list, guess_attempt)
+            print("")
+            if random_word_hint == random_word:
+                print("")
+                print(random_word_hint)
+                print(f"You guessed the word {random_word}!")
+                print("You survived!")
+                win_score = win_score + 1
+                break
+        elif len(guess_attempt) >= 2 or guess_attempt.isspace() == True or len(guess_attempt) == 0:
+            print("Please, input a single letter.")
+            print("")
+        elif guess_attempt.isupper() == True or guess_attempt.isalpha() == False:
+            print("Please, enter a lowercase letter from the English alphabet.")
+            print("")
+        elif not_set_list_count >= 2:
+            print("You've already guessed this letter.")
+            print("")
+        else:
+            print("That letter doesn't appear in the word.\n")
+            counter += 1
+        if counter == 8 and random_word_hint != random_word:
+            print("You lost!")
+            lost_score = lost_score + 1
+
+while True:
+    player_option = input("Type \"play\" to play the game, \"results\" to show the scoreboard, and \"exit\" to quit: ")
+    if player_option == "play":
+        main()
+    elif player_option == "results":
+        print(f"You won: {win_score} times.")
+        print(f"You lost: {lost_score} times.")
+    elif player_option == "exit":
+        break

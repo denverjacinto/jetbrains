@@ -1,0 +1,59 @@
+import requests
+import math
+import json
+
+
+cache_empty = {}
+saved_cached = {}
+hand_coin = input("").lower()
+
+response = requests.get('http://www.floatrates.com/daily/{}.json'.format(hand_coin))  # assigned variable response to request.get
+json_response = response.json()  # assigned variable json_response to response
+
+
+# repository_save = json_response[(hand_coin)]  # assigned variable to json_response [usd]
+#repository_eur = json_response['eur']  # assigned variable to json_response [eur]
+# assigned the two_currency usd & eur to empty dictionary (saved_cached)
+# saved_cached = {'usd': {'usd': repository_save['code'], 'rate': repository_save['rate'], 'inverseRate': repository_save['inverseRate']},
+#                 'eur':{'eur': repository_save['code'], 'rate': repository_save['rate'], 'inverseRate': repository_save['inverseRate']}}
+
+# How to handle if the hand_coin is usd and eur where both are already in saved_cached dictionary
+if hand_coin == 'usd':
+    repository_save = json_response['eur']  # assigned variable to json_response [usd]
+    saved_cached = {'eur':{'eur': repository_save['code'], 'rate': repository_save['rate'], 'inverseRate': repository_save['inverseRate']}}
+elif hand_coin == 'eur':
+    repository_save = json_response['usd']  # assigned variable to json_response [usd]
+    saved_cached = {'usd': {'usd': repository_save['code'], 'rate': repository_save['rate'], 'inverseRate': repository_save['inverseRate']}}
+else:
+    repository_save = json_response['usd']
+    repository_save = json_response['eur']# assigned variable to json_response [usd]
+    saved_cached = {'usd': {'usd': repository_save['code'], 'rate': repository_save['rate'], 'inverseRate': repository_save['inverseRate']},
+                    'eur': {'eur': repository_save['code'], 'rate': repository_save['rate'], 'inverseRate': repository_save['inverseRate']}}
+
+
+
+while True:
+    coin_receive = input("").lower()
+    if coin_receive == "":
+        break
+    elif coin_receive in saved_cached or coin_receive in cache_empty :
+        amount = float(input())
+        print("Checking the cache...")
+        print("Oh! It is in the cache")
+        if coin_receive in saved_cached:
+            print(f"You received {round(amount * saved_cached[coin_receive]['rate'], 2)} {coin_receive.upper()}.")
+        elif coin_receive in cache_empty:
+            print(f"You received {round(amount * cache_empty[coin_receive]['rate'], 2)} {coin_receive.upper()}.")
+    elif coin_receive not in saved_cached:
+        amount = float(input(""))
+        print("Checking the cache...")
+        print("Sorry, but it is not in the cache!")
+        repository = json_response[(coin_receive)]
+        print(f"You received {round(amount * repository['rate'], 2)} {coin_receive.upper()}.")
+        # .update -- to update the dictionary(cache_empty) of new set of dict
+        cache_empty.update({coin_receive: {coin_receive: repository['code'], 'rate': repository['rate'], 'inverseRate': repository['inverseRate']}})
+        #  print(cache_empty)
+
+# sample to print only
+# print(saved_cached['usd']['rate'])
+

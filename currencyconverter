@@ -11,12 +11,6 @@ response = requests.get('http://www.floatrates.com/daily/{}.json'.format(hand_co
 json_response = response.json()  # assigned variable json_response to response
 
 
-# repository_save = json_response[(hand_coin)]  # assigned variable to json_response [usd]
-#repository_eur = json_response['eur']  # assigned variable to json_response [eur]
-# assigned the two_currency usd & eur to empty dictionary (saved_cached)
-# saved_cached = {'usd': {'usd': repository_save['code'], 'rate': repository_save['rate'], 'inverseRate': repository_save['inverseRate']},
-#                 'eur':{'eur': repository_save['code'], 'rate': repository_save['rate'], 'inverseRate': repository_save['inverseRate']}}
-
 # How to handle if the hand_coin is usd and eur where both are already in saved_cached dictionary
 if hand_coin == 'usd':
     repository_save = json_response['eur']  # assigned variable to json_response [usd]
